@@ -1,7 +1,7 @@
 // LoginPage.js
 import React, { useState } from 'react';
 
-function LoginPage() {
+function Login() {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
@@ -26,4 +26,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default Login;

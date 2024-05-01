@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function RoutinesPage() {
+function Routines() {
     const navigate  = useNavigate();
     const exercises = [
         { id: 1, name: 'Correr 5km', type: 'Cardio' },
@@ -39,16 +39,6 @@ function RoutinesPage() {
         navigate('/exercises');
     };
 
-    const addCommentToRoutine = (index, comment) => {
-        const updatedRoutines = routines.map((routine, idx) => {
-            if (idx === index) {
-                return { ...routine, comments: [...routine.comments, comment] };
-            }
-            return routine;
-        });
-        setRoutines(updatedRoutines);
-    };
-
     return (
         <div>
             <h1>Gestión de Rutinas</h1>
@@ -80,19 +70,6 @@ function RoutinesPage() {
                     <li key={index}>
                         <h3>{routine.name}</h3>
                         <p>Ejercicios: {routine.exercises.map(e => e.name).join(', ')}</p>
-                        <details>
-                            <summary>Comentarios</summary>
-                            <ul>
-                                {routine.comments.map((comment, idx) => <li key={idx}>{comment}</li>)}
-                                <li>
-                                    <input
-                                        type="text"
-                                        placeholder="Añadir comentario"
-                                        onKeyDown={event => event.key === 'Enter' ? addCommentToRoutine(index, event.target.value) : null}
-                                    />
-                                </li>
-                            </ul>
-                        </details>
                     </li>
                 ))}
             </ul>
@@ -100,4 +77,4 @@ function RoutinesPage() {
     );    
 }
 
-export default RoutinesPage;
+export default Routines;

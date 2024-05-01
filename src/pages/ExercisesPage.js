@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function ExercisesPage() {
+function Exercises() {
   const [exercises, setExercises] = useState([]);
   const [categories, setCategories] = useState([]);
   const [newExercise, setNewExercise] = useState({ name: '', category: '', description: '' });
@@ -66,4 +66,4 @@ function ExercisesPage() {
   );
 }
 
-export default ExercisesPage;
+export default Exercises;

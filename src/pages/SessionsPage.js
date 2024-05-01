@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function SessionsPage({ routines = [], userId }) { // Default routines to an empty array if not provided
+function Sessions({ routines = [], userId }) { // Default routines to an empty array if not provided
     const [sessions, setSessions] = useState([]);
     const [newSession, setNewSession] = useState({
         sessionId: Date.now(), // A unique provisional identifier using the timestamp
@@ -86,4 +86,4 @@ function SessionsPage({ routines = [], userId }) { // Default routines to an emp
     );
 }
 
-export default SessionsPage;
+export default Sessions;

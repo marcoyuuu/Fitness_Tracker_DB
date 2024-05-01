@@ -1,7 +1,6 @@
-// UsersPage.js
 import React from 'react';
 
-function AchievementsPage() {
+function Achievements() {
   return (
     <div>
       <h1>Logros</h1>
@@ -10,4 +9,4 @@ function AchievementsPage() {
   );
 }
 
-export default AchievementsPage;
+export default Achievements;

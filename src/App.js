@@ -2,13 +2,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import LoginPage from './pages/LoginPage';
+import Login from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
-import SessionsPage from './pages/SessionsPage';
-import RoutinesPage from './pages/RoutinesPage';
-import ExercisesPage from './pages/ExercisesPage';
-import GoalsPage from './pages/GoalsPage';
-import AchievementsPage from './pages/AchievementsPage';
+import Sessions from './pages/SessionsPage';
+import Routines from './pages/RoutinesPage';
+import Exercises from './pages/ExercisesPage';
+import Programs from './pages/ProgramsPage';
+import Goals from './pages/GoalsPage';
+import Achievements from './pages/AchievementsPage';
 import Progress from './pages/Progress';
 
 function App() {
@@ -16,13 +17,14 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/sessions" element={<SessionsPage />} />
-        <Route path="/routines" element={<RoutinesPage />} />
-        <Route path="/exercises" element={<ExercisesPage />} />
-        <Route path="/goals" element={<GoalsPage />} />
-        <Route path="/achievements" element={<AchievementsPage />} />
+        <Route path="/sessions" element={<Sessions />} />
+        <Route path="/routines" element={<Routines />} />
+        <Route path="/exercises" element={<Exercises />} />
+        <Route path="/programs" element={<Programs />} />
+        <Route path="/goals" element={<Goals />} />
+        <Route path="/achievements" element={<Achievements />} />
         <Route path="/progress" element={<Progress />} />
       </Routes>
     </Router>

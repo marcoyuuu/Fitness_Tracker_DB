@@ -1,7 +1,7 @@
-// UsersPage.js
+// Users.js
 import React from 'react';
 
-function GoalsPage() {
+function Goals() {
   return (
     <div>
       <h1>Metas</h1>
@@ -10,4 +10,4 @@ function GoalsPage() {
   );
 }
 
-export default GoalsPage;
+export default Goals;

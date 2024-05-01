@@ -12,6 +12,7 @@ function Navbar() {
           <li><Link to="/sessions">Sesiones</Link></li>
           <li><Link to="/routines">Rutinas</Link></li>
           <li><Link to="/exercises">Ejercicios</Link></li>
+          <li><Link to="/programs">Programas</Link></li>
           <li><Link to="/goals">Metas</Link></li>
           <li><Link to="/achievements">Logros</Link></li>
           <li><Link to="/progress">Progreso</Link></li>
