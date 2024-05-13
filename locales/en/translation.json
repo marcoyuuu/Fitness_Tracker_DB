@@ -1,0 +1,66 @@
+{
+    "glob": {
+        "language": "Language",
+        "date": "Date",
+        "duration": "Duration (in minutes)",
+        "comments": "Comments",
+        "add_comment": "Add comment",
+        "delete": "Delete"
+
+    },
+    "nav": {
+        "home": "Login",
+        "sessions": "Sessions",
+        "routines": "Routines",
+        "exercises": "Exercises",
+        "programs": "Programs",
+        "goals": "Goals",
+        "progress": "Progress"
+    },
+    "loginP": {
+        "login": "Log In",
+        "b_login": "Back to Login",
+        "register": "Register",
+        "email": "Email",
+        "enter_email": "Enter email",
+        "password": "Password",
+        "f_password": "Forgot password?",
+        "r_password": "Password Recovery",
+        "re_password": "Recover Password",
+        "confirm_password": "Confirm Password",
+        "create_account": "Create an account"
+    },
+    "dashboardP": {
+        "welcome": "Welcome Back!",
+        "snapshot": "Here's a snapshot of your recent activities and routines:",
+        "r_sessions": "Recent Sessions",
+        "y_routines": "Your Routines",
+        "y_programs": "Your Programs",
+        "add_session": "Add Session",
+        "create_routine": "Create Routine",
+        "create_program": "Create Program"
+    },
+    "sessionsP": {
+        "reg_sessions": "Register Exercise Session",
+        "reg_session": "Register Session",
+        "sel_rutina": "Select Routine",
+        "sel_rutina2": "Select a Routine",
+        "routine": "Routine"
+    },
+    "routinesP": {
+        "g_routines": "Routine Management",
+        "n_routines": "Routine name",
+        "sel_exercises": "Select exercises",
+        "c_exercises": "Create new exercise",
+        "c_routine": "Create routine"
+    },
+    "exercisesP": {
+        "g_exercises": "Exercise Management",
+        "add_exercise": "Add exercise",
+        "add_new_exercise": "Add new exercise",
+        "n_exercises": "Exercise name",
+        "list_exercises": "List of exercises"
+    }
+    
+  }
+  

@@ -1,0 +1,67 @@
+{
+    "glob": {
+        "language": "Lenguaje",
+        "date": "Fecha",
+        "duration": "Duración (en minutos)",
+        "comments": "Comentarios",
+        "add_comment": "Añadir comentario",
+        "delete": "Eliminar"
+
+    },
+    "nav": {
+        "home": "Inicio",
+        "sessions": "Sesiones",
+        "routines": "Rutinas",
+        "exercises": "Ejercicios",
+        "programs": "Programas",
+        "goals": "Metas",
+        "progress": "Progreso"
+    },
+    "loginP": {
+        "login": "Iniciar Sesión",
+        "b_login": "Volver al inicio de sesión",
+        "register": "Registrarse",
+        "email": "Correo Electrónico",
+        "enter_email": "Ingrese correo",
+        "password": "Contraseña",
+        "f_password": "¿Has olvidado tu contraseña?",
+        "r_password": "Recuperación de contraseña",
+        "re_password": "Recuperar contraseña",
+        "confirm_password": "Confirmar Contraseña",
+        "create_account": "Crear una cuenta"
+    },
+    "dashboardP": {
+        "welcome": "¡Bienvenido de nuevo!",
+        "snapshot": "Aquí tienes un resumen de tus actividades y rutinas recientes:",
+        "r_sessions": "Sesiones Recientes",
+        "y_routines": "Tus Rutinas",
+        "y_programs": "Tus Programas",
+        "add_session": "Añadir Sesión",
+        "create_routine": "Crear Rutina",
+        "create_program": "Crear Programa"
+    },
+    "sessionsP": {
+        "reg_sessions": "Registro de Sesiones de Ejercicio",
+        "reg_session": "Registrar Sesión",
+        "sel_rutina": "Seleccionar Rutina",
+        "sel_rutina2": "Seleccione una Rutina",
+        "routine": "Rutina"
+    },
+    "routinesP": {
+        "g_routines": "Gestión de Rutinas",
+        "n_routines": "Nombre de la rutina",
+        "sel_exercises": "Seleccionar ejercicios",
+        "c_exercises": "Crear nuevo ejercicio",
+        "c_routine": "Crear rutina"
+    },
+    "exercisesP": {
+        "g_exercises": "Gestión de Ejercicios",
+        "add_exercise": "Añadir ejercicio",
+        "add_new_exercise": "Añadir nuevo ejercicio",
+        "n_exercises": "Nombre del ejercicio",
+        "sel_category": "Seleccione categoría",
+        "list_exercises": "Lista de ejercicios"
+    }
+    
+  }
+  
