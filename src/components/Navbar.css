@@ -1,25 +1,60 @@
-nav {
-    background: #333;
-    color: white;
-    padding: 1rem;
-  }
-  
-  ul {
-    list-style: none;
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  li {
-    padding: 0.5rem;
-  }
-  
-  a {
-    color: white;
-    text-decoration: none;
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
+/* Navbar.css */
+:root {
+  --main-green: #048c44;
+  --accent-cyan: #6CE2F5;
+  --accent-light-green: #6CF57D;
+  --text-white: #FFFFFF;
+  --text-black: #000000;
+  --active-bg-color: rgba(255, 255, 255, 0.2); /* White with transparency for light active background */
+}
+
+.navbar-nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-around; /* This ensures equal spacing */
+}
+
+.nav-item, .nav-dropdown {
+  flex-grow: 1; /* Grow equally */
+  display: flex; /* Make sure this is also a flex container */
+}
+
+.nav-link, .dropdown-toggle {
+  flex-grow: 1; /* Ensure it fills the nav-item or nav-dropdown */
+  display: flex; /* Flex display to align text */
+  align-items: center; /* Center align vertically */
+  justify-content: center; /* Center align horizontally */
+  padding: 0.5rem 1rem; /* Default Bootstrap padding for nav links */
+  width: 100%; /* Full width to cover all space */
+}
+
+.nav-link:hover, .nav-link:focus, .dropdown-toggle:hover, .dropdown-toggle:focus {
+  background-color: var(--active-bg-color); /* Hover effect covers the full link */
+  text-decoration: none; /* Removes underline on hover */
+}
+
+.navbar-custom {
+  background-color: var(--main-green);
+  border-bottom: 2px solid var(--accent-cyan);
+}
+
+.navbar-brand, .nav-link, .dropdown-toggle {
+  color: var(--text-white) !important;
+}
+
+.language-dropdown .dropdown-menu {
+  background-color: var(--text-white);
+}
+
+.dropdown-item {
+  color: var(--text-black);
+}
+
+.dropdown-item:hover {
+  background-color: var(--accent-cyan);
+}
+
+.active-nav-link {
+  background-color: var(--active-bg-color) !important;
+  border-radius: 5px;
+}

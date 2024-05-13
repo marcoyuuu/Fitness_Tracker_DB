@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 function Routines() {
+    const { t } = useTranslation();
     const navigate  = useNavigate();
     const exercises = [
         { id: 1, name: 'Correr 5km', type: 'Cardio' },
@@ -41,14 +43,14 @@ function Routines() {
 
     return (
         <div>
-            <h1>Gestión de Rutinas</h1>
+            <h1>{t('routinesP.g_routines')}</h1>
             <form onSubmit={addRoutine}>
                 <label>
-                    Nombre de la Rutina:
+                {t('routinesP.n_routines')}:
                     <input type="text" name="name" value={newRoutine.name} onChange={handleRoutineChange} required />
                 </label>
                 <fieldset>
-                    <legend>Seleccionar Ejercicios:</legend>
+                    <legend>{t('routinesP.sel_exercises')}:</legend>
                     {exercises.map(exercise => (
                         <div key={exercise.id}>
                             <label>
@@ -61,15 +63,15 @@ function Routines() {
                             </label>
                         </div>
                     ))}
-                    <button type="button" onClick={navigateToExercises}>Crear Nuevo Ejercicio</button>                    
+                    <button type="button" onClick={navigateToExercises}>{t('routinesP.c_exercises')}</button>                    
                 </fieldset>
-                <button type="submit">Crear Rutina</button>
+                <button type="submit">{t('routinesP.c_routine')}</button>
             </form>
             <ul>
                 {routines.map((routine, index) => (
                     <li key={index}>
                         <h3>{routine.name}</h3>
-                        <p>Ejercicios: {routine.exercises.map(e => e.name).join(', ')}</p>
+                        <p>{t('nav.exercises')}: {routine.exercises.map(e => e.name).join(', ')}</p>
                     </li>
                 ))}
             </ul>

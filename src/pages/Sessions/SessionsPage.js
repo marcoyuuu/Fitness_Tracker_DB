@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function Sessions({ routines = [], userId }) { // Default routines to an empty array if not provided
+    const { t } = useTranslation();
     const [sessions, setSessions] = useState([]);
     const [newSession, setNewSession] = useState({
         sessionId: Date.now(), // A unique provisional identifier using the timestamp
@@ -11,15 +12,10 @@ function Sessions({ routines = [], userId }) { // Default routines to an empty a
         userId: userId, // Assuming the user ID is passed as a prop
         comments: []
     });
-    const navigate = useNavigate();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
         setNewSession({ ...newSession, [name]: value });
-    };
-
-    const handleSelectRoutine = (routineId) => {
-        setNewSession({ ...newSession, routineId });
     };
 
     const addSession = (event) => {
@@ -40,40 +36,40 @@ function Sessions({ routines = [], userId }) { // Default routines to an empty a
 
     return (
         <div>
-            <h1>Registro de Sesiones de Ejercicio</h1>
+            <h1>{t('sessionsP.reg_sessions')}</h1>
             <form onSubmit={addSession}>
                 <label>
-                    Fecha:
+                {t('glob.date')}:
                     <input type="date" name="date" value={newSession.date} onChange={handleChange} required />
                 </label>
                 <label>
-                    Duración (en minutos):
+                {t('glob.duration')}:
                     <input type="number" name="duration" value={newSession.duration} onChange={handleChange} required />
                 </label>
                 <label>
-                    Seleccionar Rutina:
+                {t('sessionsP.sel_rutina')}:
                     <select name="routineId" value={newSession.routineId} onChange={handleChange}>
-                        <option value="">Seleccione una Rutina</option>
+                        <option value="">{t('sessionsP.sel_rutina2')}</option>
                         {routines.map(routine => (
                             <option key={routine.id} value={routine.id}>{routine.name}</option>
                         ))}
                     </select>
                 </label>
-                <button type="submit">Registrar Sesión</button>
+                <button type="submit">{t('sessionsP.reg_session')}</button>
             </form>
             <ul>
                 {sessions.map(session => (
                     <li key={session.sessionId}>
                         <h3>{`Sesión del ${session.date} - Duración: ${session.duration} minutos`}</h3>
-                        <p>Rutina: {routines.find(r => r.id === session.routineId)?.name || 'No especificada'}</p>
+                        <p>{t('sessionsP.routine')}: {routines.find(r => r.id === session.routineId)?.name || 'No especificada'}</p>
                         <details>
-                            <summary>Comentarios</summary>
+                            <summary>{t('glob.comments')}</summary>
                             <ul>
                                 {session.comments.map((comment, index) => <li key={index}>{comment}</li>)}
                                 <li>
                                     <input
                                         type="text"
-                                        placeholder="Añadir comentario"
+                                        placeholder={t('glob.add_comment')}
                                         onKeyDown={event => event.key === 'Enter' && addComment(session.sessionId, event.target.value)}
                                     />
                                 </li>

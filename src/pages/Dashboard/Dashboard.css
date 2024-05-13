@@ -1,0 +1,65 @@
+.dashboard {
+    padding: 20px;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  
+  .dashboard-actions button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .dashboard-actions button:hover {
+    background-color: #45a049;
+  }
+  
+  .session-card, .routine-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+  
+  h1, h2 {
+    color: #444;
+  }
+  
+  /* Add more styles to make the dashboard more visually appealing */
+  .dashboard {
+    background-image: linear-gradient(to bottom, #f4f4f9, #fff);
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-actions {
+    margin-bottom: 20px;
+  }
+  
+  .session-card, .routine-card {
+    background-color: #f7f7f7;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .session-card h2, .routine-card h2 {
+    font-weight: bold;
+    margin-top: 0;
+  }
+  
+  .session-card p, .routine-card p {
+    margin-bottom: 10px;
+  }
+  
+  .session-card strong, .routine-card strong {
+    font-weight: bold;
+  }
