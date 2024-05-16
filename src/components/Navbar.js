@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Navbar, Nav, Container, NavDropdown, NavItem } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 
 function BootstrapNavbar() {
@@ -11,37 +11,54 @@ function BootstrapNavbar() {
     i18n.changeLanguage(language);
   };
 
+  const setActiveLinkClass = ({ isActive }) => isActive ? "nav-link active-nav-link" : "nav-link";
+
   return (
     <Navbar expand="lg" variant="dark" className="navbar-custom">
       <Container>
-        <Navbar.Brand href="#home">Fitness Tracker</Navbar.Brand>
+        <Navbar.Brand>
+          <NavLink to="/dashboard" className="navbar-brand">
+            Fitness Tracker
+          </NavLink>
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto navbar-nav">
-            <LinkContainer to="/" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.home')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/dashboard" activeClassName="active-nav-link">
-              <Nav.Link>Dashboard</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/sessions" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.sessions')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/routines" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.routines')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/exercises" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.exercises')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/programs" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.programs')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/goals" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.goals')}</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/progress" activeClassName="active-nav-link">
-              <Nav.Link>{t('nav.progress')}</Nav.Link>
-            </LinkContainer>
+            <NavItem>
+              <NavLink to="/" className={setActiveLinkClass}>
+                {t('nav.home')}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/dashboard" className={setActiveLinkClass}>
+                Dashboard
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/sessions" className={setActiveLinkClass}>
+                {t('nav.sessions')}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/routines" className={setActiveLinkClass}>
+                {t('nav.routines')}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/exercises" className={setActiveLinkClass}>
+                {t('nav.exercises')}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/programs" className={setActiveLinkClass}>
+                {t('nav.programs')}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/goals" className={setActiveLinkClass}>
+                {t('nav.goals')}
+              </NavLink>
+            </NavItem>
             <NavDropdown title={t('glob.language')} id="language-nav-dropdown" className="language-dropdown">
               <NavDropdown.Item onClick={() => changeLanguage('en')}>English</NavDropdown.Item>
               <NavDropdown.Item onClick={() => changeLanguage('es')}>Español</NavDropdown.Item>

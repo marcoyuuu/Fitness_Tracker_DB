@@ -5,7 +5,11 @@
         "duration": "Duración (en minutos)",
         "comments": "Comentarios",
         "add_comment": "Añadir comentario",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "delete?": "¿Estás seguro de que deseas eliminar este ejercicio?",
+        "edit": "Editar",
+        "cancel": "Cancelar",
+        "description": "Descripción"
 
     },
     "nav": {
@@ -14,8 +18,7 @@
         "routines": "Rutinas",
         "exercises": "Ejercicios",
         "programs": "Programas",
-        "goals": "Metas",
-        "progress": "Progreso"
+        "goals": "Metas"
     },
     "loginP": {
         "login": "Iniciar Sesión",
@@ -48,20 +51,47 @@
         "routine": "Rutina"
     },
     "routinesP": {
-        "g_routines": "Gestión de Rutinas",
-        "n_routines": "Nombre de la rutina",
-        "sel_exercises": "Seleccionar ejercicios",
-        "c_exercises": "Crear nuevo ejercicio",
-        "c_routine": "Crear rutina"
+            "g_routines": "Rutinas",
+            "add_new_routine": "Agregar Nueva Rutina",
+            "update_routine": "Actualizar Rutina",
+            "select_category": "Seleccionar Categoría",
+            "n_routines": "Nombre de la Rutina",
+            "sel_exercises": "Seleccionar Ejercicios",
+            "c_exercises": "Crear Ejercicios",
+            "c_routine": "Crear Rutina",
+            "list_routines": "Lista de Rutinas",
+            "description": "Descripción"
     },
     "exercisesP": {
         "g_exercises": "Gestión de Ejercicios",
         "add_exercise": "Añadir ejercicio",
         "add_new_exercise": "Añadir nuevo ejercicio",
         "n_exercises": "Nombre del ejercicio",
-        "sel_category": "Seleccione categoría",
-        "list_exercises": "Lista de ejercicios"
+        "select_category": "Seleccione categoría",
+        "list_exercises": "Lista de ejercicios",
+        "select_stretch_type": "Seleccionar Tipo de Estiramiento",
+        "update_exercise": "Editar ejercicio"
+    },
+    "goalsP": {
+      "deadline": "Fecha Límite",
+      "description": "Descripción",
+      "description_placeholder": "Ingrese la descripción de la meta",
+      "completed": "Completado",
+      "not_completed": "No Completado",
+      "add_goal": "Agregar Meta",
+      "update_goal": "Actualizar Meta",
+      "list_goals": "Lista de Metas"
+    },
+    "programsP": {
+      "n_program": "Nombre del Programa",
+      "description": "Descripción",
+      "start_date": "Fecha de Inicio",
+      "end_date": "Fecha de Fin",
+      "add_program": "Agregar Programa",
+      "update_program": "Actualizar Programa",
+      "list_programs": "Lista de Programas",
+      "no_end_date": "Sin Fecha de Fin",
+      "sel_routines": "Seleccionar Rutinas"
     }
-    
   }
   

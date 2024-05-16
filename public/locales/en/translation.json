@@ -5,8 +5,11 @@
         "duration": "Duration (in minutes)",
         "comments": "Comments",
         "add_comment": "Add comment",
-        "delete": "Delete"
-
+        "delete": "Delete",
+        "delete?": "Are you sure you want to delete this exercise?",
+        "edit": "Edit",
+        "cancel": "Cancel",
+        "description": "Description"
     },
     "nav": {
         "home": "Login",
@@ -14,8 +17,7 @@
         "routines": "Routines",
         "exercises": "Exercises",
         "programs": "Programs",
-        "goals": "Goals",
-        "progress": "Progress"
+        "goals": "Goals"
     },
     "loginP": {
         "login": "Log In",
@@ -48,19 +50,47 @@
         "routine": "Routine"
     },
     "routinesP": {
-        "g_routines": "Routine Management",
-        "n_routines": "Routine name",
-        "sel_exercises": "Select exercises",
-        "c_exercises": "Create new exercise",
-        "c_routine": "Create routine"
+        "g_routines": "Routines",
+        "add_new_routine": "Add New Routine",
+        "update_routine": "Update Routine",
+        "select_category": "Select Category",
+        "n_routines": "Routine Name",
+        "sel_exercises": "Select Exercises",
+        "c_exercises": "Create Exercises",
+        "c_routine": "Create Routine",
+        "list_routines": "List of Routines",
+        "description": "Description"
     },
     "exercisesP": {
         "g_exercises": "Exercise Management",
         "add_exercise": "Add exercise",
         "add_new_exercise": "Add new exercise",
         "n_exercises": "Exercise name",
-        "list_exercises": "List of exercises"
+        "select_category": "Select category",
+        "list_exercises": "List of exercises",
+        "select_stretch_type": "Select Stretch Type",
+        "update_exercise": "Edit exercise"
+    },
+    "goalsP": {
+      "deadline": "Deadline",
+      "description": "Description",
+      "description_placeholder": "Enter the description of the goal",
+      "completed": "Completed",
+      "not_completed": "Not Completed",
+      "add_goal": "Add Goal",
+      "update_goal": "Update Goal",
+      "list_goals": "List of Goals"
+    },
+    "programsP": {
+      "n_program": "Program Name",
+      "description": "Description",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "add_program": "Add Program",
+      "update_program": "Update Program",
+      "list_programs": "List of Programs",
+      "no_end_date": "No End Date",
+      "sel_routines": "Select Routines"
     }
-    
   }
   

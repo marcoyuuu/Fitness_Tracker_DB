@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -6,20 +7,27 @@ import './Dashboard.css';
 function Dashboard() {
   const { t } = useTranslation();
   const navigate  = useNavigate();
-  const [recentSessions] = useState([
-    { date: "2023-10-01", duration: "45 minutes", type: "Cardio" },
-    { date: "2023-09-29", duration: "30 minutes", type: "Strength" },
-  ]);
+  const [recentSessions, setRecentSessions] = useState([]);
+  const [routines, setRoutines] = useState([]);
+  const [programs, setPrograms] = useState([]);
 
-  const [routines] = useState([
-    { name: "Morning Cardio", description: "A quick morning workout to get the heart pumping" },
-    { name: "Strength Training", description: "Evening lifting session to build muscle" },
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const sessionsResponse = await axios.get('http://localhost/react_php_app/api.php?table=sesión');
+        const routinesResponse = await axios.get('http://localhost/react_php_app/api.php?table=rutina');
+        const programsResponse = await axios.get('http://localhost/react_php_app/api.php?table=programa');
+        
+        setRecentSessions(sessionsResponse.data);
+        setRoutines(routinesResponse.data);
+        setPrograms(programsResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-  const [programs] = useState([
-    { name: "Morning Cardio", description: "A quick morning workout to get the heart pumping" },
-    { name: "Strength Training", description: "Evening lifting session to build muscle" },
-  ]);
+    fetchData();
+  }, []);
 
   const navigateToSessions = () => {
     navigate('/sessions');
@@ -45,28 +53,29 @@ function Dashboard() {
       <div className="recent-sessions">
         <h2>{t('dashboardP.r_sessions')}</h2>
         {recentSessions.map((session, index) => (
-          <div key={index} className="session-card">
-            <p><strong>Date:</strong> {session.date}</p>
-            <p><strong>Duration:</strong> {session.duration}</p>
-            <p><strong>Type:</strong> {session.type}</p>
+          <div key={session.SesiónID || index} className="session-card">
+            <p><strong>{t('glob.date')}:</strong> {session.Fecha}</p>
+            <p><strong>{t('glob.duration')}:</strong> {session.Duración}</p>
           </div>
         ))}
       </div>
       <div className="routines">
         <h2>{t('dashboardP.y_routines')}</h2>
         {routines.map((routine, index) => (
-          <div key={index} className="routine-card">
-            <h3>{routine.name}</h3>
-            <p>{routine.description}</p>
+          <div key={routine.RutinaID || index} className="routine-card">
+            <h3>{routine.Nombre}</h3>
+            <p>{routine.Descripción}</p>
           </div>
         ))}
       </div>
       <div className="programs">
         <h2>{t('dashboardP.y_programs')}</h2>
         {programs.map((program, index) => (
-          <div key={index} className="routine-card">
-            <h3>{program.name}</h3>
-            <p>{program.description}</p>
+          <div key={program.ProgramaID || index} className="program-card">
+            <h3>{program.Nombre}</h3>
+            <p>{program.Descripción}</p>
+            <p><strong>{t('glob.start_date')}:</strong> {program.FechaInicio}</p>
+            <p><strong>{t('glob.end_date')}:</strong> {program.FechaFin || t('programsP.no_end_date')}</p>
           </div>
         ))}
       </div>
