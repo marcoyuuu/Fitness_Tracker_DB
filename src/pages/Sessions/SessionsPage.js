@@ -2,35 +2,46 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-function Sessions({ routines = [], userId }) { // Default routines to an empty array if not provided
+function Sessions({ userId }) {
     const { t } = useTranslation();
     const [sessions, setSessions] = useState([]);
+    const [routines, setRoutines] = useState([]);
     const [newSession, setNewSession] = useState({
-        sessionId: Date.now(), // A unique provisional identifier using the timestamp
+        sessionId: Date.now(),
         date: '',
         duration: '',
         routineId: '',
-        userId: userId, // Assuming the user ID is passed as a prop
+        userId: userId,
         comments: []
     });
 
     useEffect(() => {
-        const fetchSessions = async () => {
+        async function fetchData() {
             try {
-                const response = await axios.get('http://localhost/react_php_app/api.php?table=sesión');
-                if (Array.isArray(response.data)) {
-                    setSessions(response.data);
+                const [sessionsResponse, routinesResponse] = await Promise.all([
+                    axios.get('http://localhost/react_php_app/api.php?table=sesión'),
+                    axios.get('http://localhost/react_php_app/api.php?table=rutina')
+                ]);
+
+                console.log('Sessions:', sessionsResponse.data); // Debugging log
+                console.log('Routines:', routinesResponse.data); // Debugging log
+
+                if (Array.isArray(sessionsResponse.data)) {
+                    setSessions(sessionsResponse.data);
                 } else {
-                    console.error('Fetched data is not an array:', response.data);
-                    setSessions([]); // Set to empty array if data is not valid
+                    console.error('Sessions data is not an array:', sessionsResponse.data);
+                }
+
+                if (Array.isArray(routinesResponse.data)) {
+                    setRoutines(routinesResponse.data);
+                } else {
+                    console.error('Routines data is not an array:', routinesResponse.data);
                 }
             } catch (error) {
-                console.error('Error fetching sessions:', error);
-                setSessions([]); // Ensure sessions is set to an empty array on error
+                console.error('Error fetching data:', error);
             }
-        };
-
-        fetchSessions();
+        }
+        fetchData();
     }, []);
 
     const handleChange = (event) => {
@@ -42,26 +53,15 @@ function Sessions({ routines = [], userId }) { // Default routines to an empty a
         event.preventDefault();
         try {
             const response = await axios.post('http://localhost/react_php_app/api.php?table=sesión', newSession);
-            if (response.data.id) {  // Make sure that ID is returned and is valid
-                const addedSession = { ...newSession, SesiónID: response.data.id };
-                setSessions([...sessions, addedSession]);
-                setNewSession({ sessionId: Date.now(), date: '', duration: '', routineId: '', userId: userId, comments: [] }); // Reset form
+            if (response.data && response.data.id) {
+                setSessions([...sessions, { ...newSession, SesiónID: response.data.id }]);
+                setNewSession({ sessionId: Date.now(), date: '', duration: '', routineId: '', comments: [] });
             } else {
-                console.error('Error adding session:', response.data);
+                console.error('Failed to add session:', response.data);
             }
         } catch (error) {
             console.error('Error adding session:', error);
         }
-    };
-
-    const addComment = (sessionId, comment) => {
-        const updatedSessions = sessions.map(session => {
-            if (session.SesiónID === sessionId) {
-                return { ...session, comments: [...session.comments, comment] };
-            }
-            return session;
-        });
-        setSessions(updatedSessions);
     };
 
     return (
@@ -79,32 +79,19 @@ function Sessions({ routines = [], userId }) { // Default routines to an empty a
                 <label>
                     {t('sessionsP.sel_rutina')}:
                     <select name="routineId" value={newSession.routineId} onChange={handleChange}>
-                        <option value="">{t('sessionsP.sel_rutina2')}</option>
-                        {routines.map(routine => (
+                        <option value="">Select a routine</option>
+                        {routines?.map(routine => (
                             <option key={routine.RutinaID} value={routine.RutinaID}>{routine.Nombre}</option>
                         ))}
                     </select>
                 </label>
-                <button type="submit">{t('sessionsP.reg_session')}</button>
+                <button type="submit">Register Session</button>
             </form>
             <ul>
-                {sessions && sessions.map(session => (
+                {sessions?.map(session => (
                     <li key={session.SesiónID}>
-                        <h3>{`Sesión del ${session.Fecha} - Duración: ${session.Duración}`}</h3>
-                        <p>{t('sessionsP.routine')}: {routines.find(r => r.RutinaID === session.RutinaID)?.Nombre || 'No especificada'}</p>
-                        <details>
-                            <summary>{t('glob.comments')}</summary>
-                            <ul>
-                                {session.comments && session.comments.map((comment, index) => <li key={index}>{comment}</li>)}
-                                <li>
-                                    <input
-                                        type="text"
-                                        placeholder={t('glob.add_comment')}
-                                        onKeyDown={event => event.key === 'Enter' && addComment(session.SesiónID, event.target.value)}
-                                    />
-                                </li>
-                            </ul>
-                        </details>
+                        <h3>{`Session on ${session.date} - Duration: ${session.duration}`}</h3>
+                        <p>{`Routine: ${routines.find(r => r.RutinaID === session.RutinaID)?.Nombre || 'Not specified'}`}</p>
                     </li>
                 ))}
             </ul>
