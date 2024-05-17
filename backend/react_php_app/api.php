@@ -6,9 +6,9 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // Database configuration settings
 $serverName = "localhost";
-$userName = "marcoyc";
-$password = "r8W24BHI";
-$dbName = "S224DB_marcoyc";
+$userName = ""; // Confidential
+$password = ""; // Confidential
+$dbName = ""; // Confidential
 
 $conn = new mysqli($serverName, $userName, $password, $dbName);
 
