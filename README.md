@@ -1,4 +1,4 @@
-### Fitness Tracker Web Application
+# Fitness Tracker Web Application
 
 This is a Fitness Tracker Web Application built with a React frontend and a PHP/MySQL backend. The application allows users to track their fitness activities, manage routines, and participate in fitness programs.
 
@@ -14,6 +14,18 @@ This is a Fitness Tracker Web Application built with a React frontend and a PHP/
 - **Frontend**: React, Axios, i18next
 - **Backend**: PHP, MySQL
 - **Server**: Apache
+
+## Documentation
+
+- PRD: docs/prd_fitness_tracker.md
+- Plan de tareas y asignación BMAD: docs/bmad_plan_tareas_asignaciones.md
+- Especificación Técnica Funcional (ETF): docs/especificacion_funcional_tecnica.md
+- OpenAPI v1 (MVP): docs/openapi/openapi-v1.yaml
+- ERD (Mermaid): docs/erd_mermaid.md
+- SQL Server DDL (modern): docs/sqlserver/fitness_tracker.sql
+- Legacy→Modern mapping (ETL): docs/sqlserver/legacy_to_modern_mapping.md
+- Local Dev Runbook: docs/runbook_local_dev.md
+- Progress & Plan: docs/progress_and_plan.md
 
 ## Installation
 
@@ -63,3 +75,24 @@ Access the frontend at `http://localhost:3000` and the backend at `http://localh
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+# Fitness_Tracker_DB
+
+A full-stack reference implementation for a Fitness Tracker: modern SQL Server schema, Django REST API, and React frontend. Includes ETL from a legacy MariaDB dataset.
+
+See `docs/` for detailed specifications and database artifacts. Quick links:
+
+- Local Dev Runbook: docs/runbook_local_dev.md
+- Progress & Plan: docs/progress_and_plan.md
+
+## Structure
+- backend/ — Django + DRF API
+- frontend/ — React app
+- tools/etl — MariaDB → SQL Server ETL
+- docs/ — PRD, ERD, OpenAPI, DDL, and runbook
+
+## Quickstart
+- Backend: run `bash scripts/setup_backend.sh` from repo root
+- Frontend: `cd frontend && npm install && npm start`
+
+For more, read docs/runbook_local_dev.md.

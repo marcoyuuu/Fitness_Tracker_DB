@@ -1,0 +1,16 @@
+[project]
+name = "fitness-tracker-api"
+version = "0.1.0"
+description = "Fitness Tracker API (Django REST Framework)"
+requires-python = ">=3.10"
+dependencies = [
+  "Django==5.0.6",
+  "djangorestframework==3.15.1",
+  "drf-spectacular==0.27.2",
+  "django-environ==0.11.2",
+  "mssql-django==1.5",
+  "PyJWT==2.9.0",
+]
+
+[tool.black]
+line-length = 100

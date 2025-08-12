@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Navbar, Nav, Container, NavDropdown, NavItem } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import './Navbar.css';
+import { useAuth } from '../context/AuthContext';
 
 function BootstrapNavbar() {
   const { t, i18n } = useTranslation();
+  const { user, logout, access } = useAuth();
 
   const changeLanguage = (language) => {
     i18n.changeLanguage(language);
@@ -63,6 +65,20 @@ function BootstrapNavbar() {
               <NavDropdown.Item onClick={() => changeLanguage('en')}>English</NavDropdown.Item>
               <NavDropdown.Item onClick={() => changeLanguage('es')}>Español</NavDropdown.Item>
             </NavDropdown>
+          </Nav>
+          <Nav>
+            {access ? (
+              <>
+                <Navbar.Text className="me-3">{user?.email}</Navbar.Text>
+                <Nav.Link onClick={logout}>{t('nav.logout') || 'Logout'}</Nav.Link>
+              </>
+            ) : (
+              <NavItem>
+                <NavLink to="/" className={setActiveLinkClass}>
+                  {t('loginP.login')}
+                </NavLink>
+              </NavItem>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

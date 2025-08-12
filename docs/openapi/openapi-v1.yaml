@@ -1,0 +1,842 @@
+openapi: 3.0.3
+info:
+  title: Fitness Tracker API
+  version: 1.0.0
+  description: Initial OpenAPI v1 for MVP (users/auth, sessions, goals).
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /auth/login:
+    post:
+      summary: Login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenSet'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenSet'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /users/me:
+    get:
+      summary: Get current user profile
+      tags: [Users]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update profile
+      tags: [Users]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /sessions:
+    get:
+      summary: List sessions
+      tags: [Sessions]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create session
+      tags: [Sessions]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /sessions/{id}:
+    get:
+      summary: Get session
+      tags: [Sessions]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Session' }}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update session
+      tags: [Sessions]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionUpdate'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Session' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      summary: Delete session
+      tags: [Sessions]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /goals:
+    get:
+      summary: List goals
+      tags: [Goals]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create goal
+      tags: [Goals]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /goals/{id}:
+    patch:
+      summary: Update goal
+      tags: [Goals]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalUpdate'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Goal' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # Routines (rutina)
+  /routines:
+    get:
+      summary: List routines
+      tags: [Routines]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Routine' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create routine
+      tags: [Routines]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RoutineCreate' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Routine' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /routines/{id}:
+    get:
+      summary: Get routine
+      tags: [Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Routine' }}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update routine
+      tags: [Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RoutineUpdate' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Routine' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      summary: Delete routine
+      tags: [Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # Exercises (ejercicio)
+  /exercises:
+    get:
+      summary: List exercises
+      tags: [Exercises]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Exercise' }}}}}
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create exercise
+      tags: [Exercises]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExerciseCreate' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Exercise' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /exercises/{id}:
+    get:
+      summary: Get exercise
+      tags: [Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Exercise' }}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update exercise
+      tags: [Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExerciseUpdate' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Exercise' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      summary: Delete exercise
+      tags: [Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # Programs (programa)
+  /programs:
+    get:
+      summary: List programs
+      tags: [Programs]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Program' }}}}}
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create program
+      tags: [Programs]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProgramCreate' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Program' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /programs/{id}:
+    get:
+      summary: Get program
+      tags: [Programs]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Program' }}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update program
+      tags: [Programs]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProgramUpdate' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Program' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      summary: Delete program
+      tags: [Programs]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # Session comments (comentario)
+  /sessions/{id}/comments:
+    get:
+      summary: List comments for a session
+      tags: [Comments]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Comment' }}}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Add comment to a session
+      tags: [Comments]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentCreate' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Comment' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /comments/{comment_id}:
+    get:
+      summary: Get comment
+      tags: [Comments]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: comment_id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Comment' }}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      summary: Update comment
+      tags: [Comments]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: comment_id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentUpdate' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Comment' }}}}
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      summary: Delete comment
+      tags: [Comments]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: comment_id, required: true, schema: { type: string }}]
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # Associations
+  /routines/{id}/exercises:
+    get:
+      summary: List exercises in a routine
+      tags: [Routines, Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Exercise' }}}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Link exercise to routine
+      tags: [Routines, Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RoutineExerciseLink' }
+      responses:
+        '204': { description: No Content }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /routines/{id}/exercises/{exercise_id}:
+    delete:
+      summary: Unlink exercise from routine
+      tags: [Routines, Exercises]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string }}
+        - { in: path, name: exercise_id, required: true, schema: { type: string }}
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /programs/{id}/routines:
+    get:
+      summary: List routines in a program
+      tags: [Programs, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Routine' }}}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Link routine to program
+      tags: [Programs, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProgramRoutineLink' }
+      responses:
+        '204': { description: No Content }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /programs/{id}/routines/{routine_id}:
+    delete:
+      summary: Unlink routine from program
+      tags: [Programs, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string }}
+        - { in: path, name: routine_id, required: true, schema: { type: string }}
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /sessions/{id}/routines:
+    get:
+      summary: List routines in a session
+      tags: [Sessions, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      responses:
+        '200': { description: List, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Routine' }}}}}
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Link routine to session
+      tags: [Sessions, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters: [{ in: path, name: id, required: true, schema: { type: string }}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SessionRoutineLink' }
+      responses:
+        '204': { description: No Content }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /sessions/{id}/routines/{routine_id}:
+    delete:
+      summary: Unlink routine from session
+      tags: [Sessions, Routines]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string }}
+        - { in: path, name: routine_id, required: true, schema: { type: string }}
+      responses:
+        '204': { description: No Content }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Bad Request
+    Unauthorized:
+      description: Unauthorized
+    NotFound:
+      description: Resource not found
+  schemas:
+    TokenSet:
+      type: object
+      properties:
+        access: { type: string }
+        refresh: { type: string }
+        token_type: { type: string, example: bearer }
+        expires_in: { type: integer, description: Seconds until access expiry }
+    AuthResponse:
+      type: object
+      properties:
+        access: { type: string }
+        refresh: { type: string }
+        token_type: { type: string, example: bearer }
+        expires_in: { type: integer }
+        user: { $ref: '#/components/schemas/User' }
+    RegisterRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        name: { type: string }
+        locale: { type: string, enum: [es, en], default: es }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        name: { type: string }
+        locale: { type: string, enum: [es, en] }
+        role: { type: string, enum: [user, admin], default: user }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    UserUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        locale: { type: string, enum: [es, en] }
+    Session:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: string }
+        date: { type: string, format: date }
+        duration_min: { type: integer, minimum: 1 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    SessionCreate:
+      type: object
+      required: [date, duration_min]
+      properties:
+        date: { type: string, format: date }
+        duration_min: { type: integer, minimum: 1 }
+    SessionUpdate:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        duration_min: { type: integer, minimum: 1 }
+    PaginatedSessions:
+      type: object
+      properties:
+        count: { type: integer }
+        next: { type: string, nullable: true }
+        previous: { type: string, nullable: true }
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+    Goal:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: string }
+        description: { type: string }
+        due_date: { type: string, format: date, nullable: true }
+        is_completed: { type: boolean }
+        completed_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    GoalCreate:
+      type: object
+      required: [description]
+      properties:
+        description: { type: string, minLength: 1 }
+        due_date: { type: string, format: date, nullable: true }
+    GoalUpdate:
+      type: object
+      properties:
+        description: { type: string }
+        due_date: { type: string, format: date, nullable: true }
+        is_completed: { type: boolean }
+        completed_at: { type: string, format: date-time, nullable: true }
+    Routine:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+    RoutineCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+    RoutineUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+    Exercise:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        sets: { type: integer, nullable: true }
+        reps: { type: integer, nullable: true }
+        weight: { type: number, format: float, nullable: true }
+        equipment: { type: string, nullable: true }
+        duration: { type: string, format: time, nullable: true }
+        distance: { type: number, format: float, nullable: true }
+        stretch_type: { type: string, nullable: true }
+        is_strength: { type: boolean, nullable: true }
+        is_cardio: { type: boolean, nullable: true }
+        is_core: { type: boolean, nullable: true }
+        is_plyo: { type: boolean, nullable: true }
+        is_flexibility: { type: boolean, nullable: true }
+    ExerciseCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+        sets: { type: integer, nullable: true }
+        reps: { type: integer, nullable: true }
+        weight: { type: number, format: float, nullable: true }
+        equipment: { type: string, nullable: true }
+        duration: { type: string, format: time, nullable: true }
+        distance: { type: number, format: float, nullable: true }
+        stretch_type: { type: string, nullable: true }
+        is_strength: { type: boolean, nullable: true }
+        is_cardio: { type: boolean, nullable: true }
+        is_core: { type: boolean, nullable: true }
+        is_plyo: { type: boolean, nullable: true }
+        is_flexibility: { type: boolean, nullable: true }
+    ExerciseUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+        sets: { type: integer, nullable: true }
+        reps: { type: integer, nullable: true }
+        weight: { type: number, format: float, nullable: true }
+        equipment: { type: string, nullable: true }
+        duration: { type: string, format: time, nullable: true }
+        distance: { type: number, format: float, nullable: true }
+        stretch_type: { type: string, nullable: true }
+        is_strength: { type: boolean, nullable: true }
+        is_cardio: { type: boolean, nullable: true }
+        is_core: { type: boolean, nullable: true }
+        is_plyo: { type: boolean, nullable: true }
+        is_flexibility: { type: boolean, nullable: true }
+    Program:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date, nullable: true }
+    ProgramCreate:
+      type: object
+      required: [name, start_date]
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date, nullable: true }
+    ProgramUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date, nullable: true }
+    Comment:
+      type: object
+      properties:
+        id: { type: string }
+        session_id: { type: string }
+        text: { type: string }
+        date: { type: string, format: date }
+    CommentCreate:
+      type: object
+      required: [text, date]
+      properties:
+        text: { type: string }
+        date: { type: string, format: date }
+    CommentUpdate:
+      type: object
+      properties:
+        text: { type: string }
+        date: { type: string, format: date }
+    RoutineExerciseLink:
+      type: object
+      required: [exercise_id]
+      properties:
+        exercise_id: { type: string }
+    ProgramRoutineLink:
+      type: object
+      required: [routine_id]
+      properties:
+        routine_id: { type: string }
+    SessionRoutineLink:
+      type: object
+      required: [routine_id]
+      properties:
+        routine_id: { type: string }
+security:
+  - bearerAuth: []

@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import HttpBackend from 'i18next-http-backend';
+import { getBasePath } from './utils/basePath';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 i18n
@@ -15,7 +16,8 @@ i18n
       escapeValue: false, // React already safes from XSS.
     },
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json', // Path to the translation files
+      // Prefix with runtime base path so it works when the app is served under a subpath
+      loadPath: `${getBasePath()}/locales/{{lng}}/{{ns}}.json`,
     }
   });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import api from '../../api/client';
 
 function Programs() {
   const { t } = useTranslation();
@@ -14,19 +14,13 @@ function Programs() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const programsResponse = await axios.get('http://localhost/react_php_app/api.php?table=programa');
-        const routinesResponse = await axios.get('http://localhost/react_php_app/api.php?table=rutina');
-        const relationsResponse = await axios.get('http://localhost/react_php_app/api.php?table=programacontienerutina');
-
-        const combinedPrograms = programsResponse.data.map(program => ({
-          ...program,
-          routines: relationsResponse.data.filter(rel => rel.ProgramaID === program.ProgramaID)
-            .map(rel => routinesResponse.data.find(rt => rt.RutinaID === rel.RutinaID))
-            .filter(rt => rt) // Filter out any undefined or null routines
-        }));
-
-        setPrograms(combinedPrograms);
-        setRoutines(routinesResponse.data);
+        const [pgRes, rtRes] = await Promise.all([
+          api.get('/programs'),
+          api.get('/routines'),
+        ]);
+        // For each program, optionally fetch routines lazily when rendering or on demand.
+        setPrograms(pgRes.data.map(p => ({ ...p, routines: [] })));
+        setRoutines(rtRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -51,36 +45,25 @@ function Programs() {
 
   const addProgram = async (event) => {
     event.preventDefault();
-    const programData = {
-      Nombre: newProgram.Nombre,
-      Descripción: newProgram.Descripción,
-      FechaInicio: newProgram.FechaInicio,
-      FechaFin: newProgram.FechaFin
-    };
-
     try {
-      const response = await axios.post('http://localhost/react_php_app/api.php?table=programa', programData);
-      const newProgramId = response.data.id;
-
-      // Prepare relationships data
-      const relations = selectedRoutines.map(routineId => ({
-        ProgramaID: newProgramId,
-        RutinaID: routineId
-      }));
-
-      console.log('Sending relationship data:', relations);
-
-      // Assuming your backend can handle batch processing of relations
-      const relResponse = await axios.post('http://localhost/react_php_app/api.php?table=programacontienerutina', { relations });
-      console.log('Relationships response:', relResponse.data);
-
-      // Update local state to reflect the new program
-      const addedProgram = {
-        ...programData,
-        ProgramaID: newProgramId,
-        routines: routines.filter(rt => selectedRoutines.includes(rt.RutinaID))
+      const { data: created } = await api.post('/programs', {
+        name: newProgram.Nombre,
+        description: newProgram.Descripción,
+        start_date: newProgram.FechaInicio,
+        end_date: newProgram.FechaFin || null,
+      });
+      for (const rtId of selectedRoutines) {
+        await api.post(`/programs/${created.id}/routines`, { routine_id: rtId });
+      }
+      const added = {
+        id: created.id,
+        Nombre: newProgram.Nombre,
+        Descripción: newProgram.Descripción,
+        FechaInicio: newProgram.FechaInicio,
+        FechaFin: newProgram.FechaFin || '',
+        routines: routines.filter(rt => selectedRoutines.includes(rt.id)),
       };
-      setPrograms([...programs, addedProgram]);
+      setPrograms([...programs, added]);
       resetForm();
     } catch (error) {
       console.error('Error adding program:', error);
@@ -90,12 +73,23 @@ function Programs() {
   const updateProgram = async (event) => {
     event.preventDefault();
     try {
-      await axios.put(`http://localhost/react_php_app/api.php?table=programa&id=${currentProgram.ProgramaID}`, {
-        ...newProgram,
-        routines: selectedRoutines
+      const id = currentProgram?.ProgramaID || currentProgram?.id;
+      await api.patch(`/programs/${id}`, {
+        name: newProgram.Nombre,
+        description: newProgram.Descripción,
+        start_date: newProgram.FechaInicio,
+        end_date: newProgram.FechaFin || null,
       });
       const updatedPrograms = programs.map(program =>
-        program.ProgramaID === currentProgram.ProgramaID ? { ...newProgram, ProgramaID: currentProgram.ProgramaID, routines: routines.filter(rt => selectedRoutines.includes(rt.RutinaID)) } : program
+        (program.ProgramaID || program.id) === id
+          ? {
+              ...program,
+              Nombre: newProgram.Nombre,
+              Descripción: newProgram.Descripción,
+              FechaInicio: newProgram.FechaInicio,
+              FechaFin: newProgram.FechaFin || '',
+            }
+          : program
       );
       setPrograms(updatedPrograms);
       resetForm();
@@ -106,8 +100,8 @@ function Programs() {
 
   const deleteProgram = async (programId) => {
     try {
-      await axios.delete(`http://localhost/react_php_app/api.php?table=programa&id=${programId}`);
-      setPrograms(programs.filter(program => program.ProgramaID !== programId));
+      await api.delete(`/programs/${programId}`);
+      setPrograms(programs.filter(program => (program.ProgramaID || program.id) !== programId));
     } catch (error) {
       console.error('Error deleting program:', error);
     }
@@ -115,13 +109,13 @@ function Programs() {
 
   const editProgram = (program) => {
     setNewProgram({
-      Nombre: program.Nombre,
-      Descripción: program.Descripción,
-      FechaInicio: program.FechaInicio.split('T')[0], // Formatear la fecha para el input
-      FechaFin: program.FechaFin ? program.FechaFin.split('T')[0] : '' // Manejar posibles valores null
+      Nombre: program.Nombre || program.name,
+      Descripción: program.Descripción || program.description,
+      FechaInicio: (program.FechaInicio || program.start_date || '').split('T')[0],
+      FechaFin: (program.FechaFin || program.end_date || '') ? (program.FechaFin || program.end_date).split('T')[0] : ''
     });
     setCurrentProgram(program);
-    setSelectedRoutines(program.routines.map(rt => rt.RutinaID));
+    setSelectedRoutines((program.routines || []).map(rt => rt.id || rt.RutinaID));
     setIsEditing(true);
   };
 
@@ -157,14 +151,14 @@ function Programs() {
         <fieldset>
           <legend>{t('programsP.sel_routines')}:</legend>
           {routines.map(routine => (
-            <div key={routine.RutinaID}>
+            <div key={routine.id || routine.RutinaID}>
               <label>
                 <input
                   type="checkbox"
-                  checked={selectedRoutines.includes(routine.RutinaID)}
-                  onChange={() => handleSelectRoutine(routine.RutinaID)}
+                  checked={selectedRoutines.includes(routine.id || routine.RutinaID)}
+                  onChange={() => handleSelectRoutine(routine.id || routine.RutinaID)}
                 />
-                {routine.Nombre}
+                {routine.name || routine.Nombre}
               </label>
             </div>
           ))}
@@ -175,14 +169,14 @@ function Programs() {
       <h2>{t('programsP.list_programs')}</h2>
       <ul>
         {programs.map((program) => (
-          <li key={program.ProgramaID}>
-            <h3>{program.Nombre}</h3>
-            <p>{program.Descripción}</p>
-            <p>{t('programsP.start_date')}: {program.FechaInicio}</p>
-            <p>{t('programsP.end_date')}: {program.FechaFin || t('programsP.no_end_date')}</p>
-            <p>{t('nav.routines')}: {program.routines.map(rt => rt.Nombre).join(', ')}</p>
+          <li key={program.ProgramaID || program.id}>
+            <h3>{program.Nombre || program.name}</h3>
+            <p>{program.Descripción || program.description}</p>
+            <p>{t('programsP.start_date')}: {program.FechaInicio || program.start_date}</p>
+            <p>{t('programsP.end_date')}: {program.FechaFin || program.end_date || t('programsP.no_end_date')}</p>
+            <p>{t('nav.routines')}: {(program.routines || []).map(rt => rt.name || rt.Nombre).join(', ')}</p>
             <button onClick={() => editProgram(program)}>{t('glob.edit')}</button>
-            <button onClick={() => deleteProgram(program.ProgramaID)}>{t('glob.delete')}</button>
+            <button onClick={() => deleteProgram(program.ProgramaID || program.id)}>{t('glob.delete')}</button>
           </li>
         ))}
       </ul>

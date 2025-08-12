@@ -18,7 +18,8 @@
         "routines": "Rutinas",
         "exercises": "Ejercicios",
         "programs": "Programas",
-        "goals": "Metas"
+    "goals": "Metas",
+    "logout": "Salir"
     },
     "loginP": {
         "login": "Iniciar Sesión",

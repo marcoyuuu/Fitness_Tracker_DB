@@ -1,0 +1,91 @@
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+.desktop
+.directory
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+.python-version
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+.coverage
+
+# Virtual environments (project-wide)
+.venv/
+venv/
+ENV/
+
+# Virtual environments (nested, e.g., backend/drf/.venv)
+**/.venv/
+**/venv/
+
+# Django local settings & artifacts
+*.log
+*.sqlite3
+*.db
+# Explicitly ignore dev DB file
+backend/drf/db.sqlite3
+
+# Env files (keep .env.example if present)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# --- Node / React (frontend) ---
+node_modules/
+**/node_modules/
+.npmrc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# CRA build output
+frontend/build/
+
+# Jest / coverage
+coverage/
+frontend/coverage/
+
+# Local dev overrides
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# --- Misc tools ---
+# VS Code task output, if any
+*.code-workspace
+
+# --- Data dumps / temp ---
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Keep SQL and docs
+!docs/**
+!**/*.sql

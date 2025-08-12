@@ -17,7 +17,8 @@
         "routines": "Routines",
         "exercises": "Exercises",
         "programs": "Programs",
-        "goals": "Goals"
+    "goals": "Goals",
+    "logout": "Logout"
     },
     "loginP": {
         "login": "Log In",

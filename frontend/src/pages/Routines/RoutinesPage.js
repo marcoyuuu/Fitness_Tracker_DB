@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import api from '../../api/client';
 
 function Routines() {
     const { t } = useTranslation();
@@ -13,18 +13,12 @@ function Routines() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const exResponse = await axios.get('http://localhost/react_php_app/api.php?table=ejercicio');
-                setExercises(exResponse.data);
-
-                const rtResponse = await axios.get('http://localhost/react_php_app/api.php?table=rutina');
-                const relResponse = await axios.get('http://localhost/react_php_app/api.php?table=rutinacontieneejercicio');
-                const combinedRoutines = rtResponse.data.map(routine => ({
-                    ...routine,
-                    exercises: relResponse.data.filter(rel => rel.RutinaID === routine.RutinaID)
-                        .map(rel => exResponse.data.find(ex => ex.EjercicioID === rel.EjercicioID))
-                        .filter(ex => ex) // Filter out any undefined or null exercises
-                }));
-                setRoutines(combinedRoutines);
+                const [exRes, rtRes] = await Promise.all([
+                    api.get('/exercises'),
+                    api.get('/routines'),
+                ]);
+                setExercises(exRes.data);
+                setRoutines(rtRes.data.map(r => ({ ...r, exercises: [] })));
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -49,32 +43,21 @@ function Routines() {
 
     const addRoutine = async (event) => {
         event.preventDefault();
-        const routineData = {
-            Nombre: newRoutine.Nombre,
-            Descripción: newRoutine.Descripción,
-        };
-
         try {
-            const response = await axios.post('http://localhost/react_php_app/api.php?table=rutina', routineData);
-            const newRoutineId = response.data.id;
+            const { data: rt } = await api.post('/routines', {
+                name: newRoutine.Nombre,
+                description: newRoutine.Descripción,
+            });
 
-            // Prepare relationships data
-            const relations = selectedExercises.map(exerciseId => ({
-                RutinaID: newRoutineId,
-                EjercicioID: exerciseId
-            }));
+            for (const exId of selectedExercises) {
+                await api.post(`/routines/${rt.id}/exercises`, { exercise_id: exId });
+            }
 
-            console.log('Sending relationship data:', relations);
-
-            // Assuming your backend can handle batch processing of relations
-            const relResponse = await axios.post('http://localhost/react_php_app/api.php?table=rutinacontieneejercicio', { relations });
-            console.log('Relationships response:', relResponse.data);
-
-            // Update local state to reflect the new routine
             const addedRoutine = {
-                ...routineData,
-                RutinaID: newRoutineId,
-                exercises: exercises.filter(ex => selectedExercises.includes(ex.EjercicioID))
+                id: rt.id,
+                Nombre: newRoutine.Nombre,
+                Descripción: newRoutine.Descripción,
+                exercises: exercises.filter(ex => selectedExercises.includes(ex.id)),
             };
             setRoutines([...routines, addedRoutine]);
             resetForm();
@@ -86,12 +69,14 @@ function Routines() {
     const updateRoutine = async (event) => {
         event.preventDefault();
         try {
-            await axios.put(`http://localhost/react_php_app/api.php?table=rutina&id=${newRoutine.RutinaID}`, {
-                ...newRoutine,
-                exercises: selectedExercises
+            const rtId = newRoutine.RutinaID || newRoutine.id;
+            await api.patch(`/routines/${rtId}`, {
+                name: newRoutine.Nombre,
+                description: newRoutine.Descripción,
             });
+            // Note: updating exercise links could be added here as needed
             const updatedRoutines = routines.map(routine =>
-                routine.RutinaID === newRoutine.RutinaID ? { ...newRoutine, exercises: exercises.filter(ex => selectedExercises.includes(ex.EjercicioID)) } : routine
+                (routine.RutinaID || routine.id) === rtId ? { ...routine, Nombre: newRoutine.Nombre, Descripción: newRoutine.Descripción } : routine
             );
             setRoutines(updatedRoutines);
             resetForm();
@@ -102,8 +87,8 @@ function Routines() {
 
     const deleteRoutine = async (routineId) => {
         try {
-            await axios.delete(`http://localhost/react_php_app/api.php?table=rutina&id=${routineId}`);
-            setRoutines(routines.filter(routine => routine.RutinaID !== routineId));
+            await api.delete(`/routines/${routineId}`);
+            setRoutines(routines.filter(routine => (routine.RutinaID || routine.id) !== routineId));
         } catch (error) {
             console.error('Error deleting routine:', error);
         }
@@ -138,14 +123,14 @@ function Routines() {
                 <fieldset>
                     <legend>{t('routinesP.sel_exercises')}:</legend>
                     {exercises.map(exercise => (
-                        <div key={exercise.EjercicioID}>
+                        <div key={exercise.id || exercise.EjercicioID}>
                             <label>
                                 <input
                                     type="checkbox"
-                                    checked={selectedExercises.includes(exercise.EjercicioID)}
-                                    onChange={() => handleSelectExercise(exercise.EjercicioID)}
+                                    checked={selectedExercises.includes(exercise.id || exercise.EjercicioID)}
+                                    onChange={() => handleSelectExercise(exercise.id || exercise.EjercicioID)}
                                 />
-                                {exercise.Nombre}
+                                {exercise.name || exercise.Nombre}
                             </label>
                         </div>
                     ))}
@@ -156,12 +141,12 @@ function Routines() {
             <h2>{t('routinesP.list_routines')}</h2>
             <ul>
                 {routines.map((routine) => (
-                    <li key={routine.RutinaID}>
-                        <h3>{routine.Nombre}</h3>
-                        <p>{t('nav.exercises')}: {routine.exercises.map(ex => ex.Nombre).join(', ')}</p>
-                        <p>{routine.Descripción}</p>
+                    <li key={routine.RutinaID || routine.id}>
+                        <h3>{routine.Nombre || routine.name}</h3>
+                        <p>{t('nav.exercises')}: {(routine.exercises || []).map(ex => ex.name || ex.Nombre).join(', ')}</p>
+                        <p>{routine.Descripción || routine.description}</p>
                         <button onClick={() => editRoutine(routine)}>Edit</button>
-                        <button onClick={() => deleteRoutine(routine.RutinaID)}>Delete</button>
+                        <button onClick={() => deleteRoutine(routine.RutinaID || routine.id)}>Delete</button>
                     </li>
                 ))}
             </ul>

@@ -1,42 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import api from '../../api/client';
 
-function Sessions({ userId }) {
+function Sessions() {
     const { t } = useTranslation();
     const [sessions, setSessions] = useState([]);
     const [routines, setRoutines] = useState([]);
-    const [newSession, setNewSession] = useState({
-        sessionId: Date.now(),
-        date: '',
-        duration: '',
-        routineId: '',
-        userId: userId,
-        comments: []
-    });
+    const [date, setDate] = useState('');
+    const [durationMin, setDurationMin] = useState('');
+    const [routineId, setRoutineId] = useState('');
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const [sessionsResponse, routinesResponse] = await Promise.all([
-                    axios.get('http://localhost/react_php_app/api.php?table=sesión'),
-                    axios.get('http://localhost/react_php_app/api.php?table=rutina')
+                const [sessionsRes, routinesRes] = await Promise.all([
+                    api.get('/sessions'),
+                    api.get('/routines'),
                 ]);
-
-                console.log('Sessions:', sessionsResponse.data); // Debugging log
-                console.log('Routines:', routinesResponse.data); // Debugging log
-
-                if (Array.isArray(sessionsResponse.data)) {
-                    setSessions(sessionsResponse.data);
-                } else {
-                    console.error('Sessions data is not an array:', sessionsResponse.data);
-                }
-
-                if (Array.isArray(routinesResponse.data)) {
-                    setRoutines(routinesResponse.data);
-                } else {
-                    console.error('Routines data is not an array:', routinesResponse.data);
-                }
+                setSessions(sessionsRes.data);
+                setRoutines(routinesRes.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -44,25 +26,26 @@ function Sessions({ userId }) {
         fetchData();
     }, []);
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setNewSession({ ...newSession, [name]: value });
-    };
-
     const addSession = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost/react_php_app/api.php?table=sesión', newSession);
-            if (response.data && response.data.id) {
-                setSessions([...sessions, { ...newSession, SesiónID: response.data.id }]);
-                setNewSession({ sessionId: Date.now(), date: '', duration: '', routineId: '', comments: [] });
-            } else {
-                console.error('Failed to add session:', response.data);
+            const { data: created } = await api.post('/sessions', {
+                date,
+                duration_min: parseInt(durationMin, 10),
+            });
+            setSessions([created, ...sessions]);
+            if (routineId) {
+                await api.post(`/sessions/${created.id}/routines`, { routine_id: routineId });
             }
+            setDate('');
+            setDurationMin('');
+            setRoutineId('');
         } catch (error) {
             console.error('Error adding session:', error);
         }
     };
+
+    const fmtRoutine = (id) => routines.find(r => r.id === id)?.name || '—';
 
     return (
         <div>
@@ -70,18 +53,18 @@ function Sessions({ userId }) {
             <form onSubmit={addSession}>
                 <label>
                     {t('glob.date')}:
-                    <input type="date" name="date" value={newSession.date} onChange={handleChange} required />
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
                 </label>
                 <label>
-                    {t('glob.duration')}:
-                    <input type="time" name="duration" value={newSession.duration} onChange={handleChange} required />
+                    {t('glob.duration')} (min):
+                    <input type="number" min="0" value={durationMin} onChange={(e) => setDurationMin(e.target.value)} required />
                 </label>
                 <label>
                     {t('sessionsP.sel_rutina')}:
-                    <select name="routineId" value={newSession.routineId} onChange={handleChange}>
+                    <select value={routineId} onChange={(e) => setRoutineId(e.target.value)}>
                         <option value="">Select a routine</option>
                         {routines?.map(routine => (
-                            <option key={routine.RutinaID} value={routine.RutinaID}>{routine.Nombre}</option>
+                            <option key={routine.id} value={routine.id}>{routine.name}</option>
                         ))}
                     </select>
                 </label>
@@ -89,9 +72,12 @@ function Sessions({ userId }) {
             </form>
             <ul>
                 {sessions?.map(session => (
-                    <li key={session.SesiónID}>
-                        <h3>{`Session on ${session.date} - Duration: ${session.duration}`}</h3>
-                        <p>{`Routine: ${routines.find(r => r.RutinaID === session.RutinaID)?.Nombre || 'Not specified'}`}</p>
+                    <li key={session.id}>
+                        <h3>{`Session on ${session.date} - Duration: ${session.duration_min} min`}</h3>
+                        <p>
+                          Routines: {/* list joined routines if any */}
+                          {/* This is a simple placeholder; for full details, fetch /sessions/{id}/routines per item */}
+                        </p>
                     </li>
                 ))}
             </ul>
