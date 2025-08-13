@@ -1,159 +1,197 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import api from '../../api/client';
 
 function Exercises() {
   const { t } = useTranslation();
   const [exercises, setExercises] = useState([]);
-  const [newExercise, setNewExercise] = useState({
-    Nombre: '',
-    Descripción: '',
-    Sets: '',
-    Repeticiones: '',
-    Peso: '',
-    Equipamiento: '',
-    Duración: '',
-    Distancia: '',
-    TipoEstiramiento: '',
-    isEntrenamientoDeFuerza: 0,
-    isCardio_Circuitos: 0,
-    isCore_Estabilidad: 0,
-    isPliométricos: 0,
-    isFlexibilidad_Movilidad: 0
-  });
   const [editing, setEditing] = useState(false);
-  const [currentExercise, setCurrentExercise] = useState(null);
+  const [currentExerciseId, setCurrentExerciseId] = useState(null);
 
   const categories = [
-    { label: 'Cardio y Circuitos', value: 'isCardio_Circuitos', attributes: ['Duración', 'Distancia'] },
-    { label: 'Entrenamiento de Fuerza', value: 'isEntrenamientoDeFuerza', attributes: ['Peso', 'Equipamiento'] },
-    { label: 'Flexibilidad y Movilidad', value: 'isFlexibilidad_Movilidad', attributes: ['Duración', 'TipoEstiramiento'] },
-    { label: 'Core y Estabilidad', value: 'isCore_Estabilidad', attributes: ['Equipamiento'] },
-    { label: 'Pliométricos', value: 'isPliométricos', attributes: ['Equipamiento', 'Peso'] }
+    { label: 'Cardio y Circuitos', value: 'is_cardio', attributes: ['duration', 'distance'] },
+    { label: 'Entrenamiento de Fuerza', value: 'is_strength', attributes: ['weight', 'equipment'] },
+    { label: 'Flexibilidad y Movilidad', value: 'is_flexibility', attributes: ['duration', 'stretch_type'] },
+    { label: 'Core y Estabilidad', value: 'is_core', attributes: ['equipment'] },
+    { label: 'Pliométricos', value: 'is_plyo', attributes: ['equipment', 'weight'] }
   ];
 
+  const emptyForm = {
+    name: '',
+    description: '',
+    sets: '',
+    reps: '',
+    weight: '',
+    equipment: '',
+    duration: '',
+    distance: '',
+    stretch_type: '',
+    is_strength: false,
+    is_cardio: false,
+    is_core: false,
+    is_plyo: false,
+    is_flexibility: false,
+    category: ''
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  // Helpers
+  const pickCategoryValue = (ex) => {
+    const order = ['is_cardio', 'is_strength', 'is_flexibility', 'is_core', 'is_plyo'];
+    return order.find(key => !!ex[key]) || '';
+  };
+
+  const hhmmToTime = (val) => {
+    if (!val) return null;
+    // Accept HH:MM or HH:MM:SS; normalize to HH:MM:SS for backend
+    if (/^\d{2}:\d{2}$/.test(val)) return `${val}:00`;
+    if (/^\d{2}:\d{2}:\d{2}$/.test(val)) return val;
+    return null;
+  };
+
+  const timeToHHMM = (val) => {
+    if (!val) return '';
+    const m = String(val).match(/^(\d{2}:\d{2})(?::\d{2})?$/);
+    return m ? m[1] : '';
+  };
+
+  const toNumberOrNull = (v) => {
+    if (v === '' || v === null || v === undefined) return null;
+    const n = Number(v);
+    return Number.isNaN(n) ? null : n;
+  };
+
+  // Load
   useEffect(() => {
-    axios.get('http://localhost/react_php_app/api.php?table=ejercicio')
-      .then(response => {
-        const exercisesWithCategory = response.data.map(exercise => {
-          // Adjust the condition to check for the string '1' instead of numerical 1
-          const categoryKey = Object.keys(exercise).find(key => exercise[key] === "1" && key.startsWith('is'));
-          return { ...exercise, category: categoryKey || '' }; // Default to empty string if no category matches
-        });
-        setExercises(exercisesWithCategory);
-      })
-      .catch(error => {
-        console.error('Error fetching exercises:', error);
-      });
+    const load = async () => {
+      try {
+        const { data } = await api.get('/exercises');
+        const mapped = (data || []).map(ex => ({
+          ...ex,
+          category: pickCategoryValue(ex),
+        }));
+        setExercises(mapped);
+      } catch (err) {
+        console.error('Error fetching exercises:', err);
+      }
+    };
+    load();
   }, []);
 
-  const handleExerciseChange = (event) => {
-    const { name, value } = event.target;
-    setNewExercise(prev => ({ ...prev, [name]: value }));
+  // Form handlers
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCategoryChange = (event) => {
-    const { value } = event.target;
-    const resetExercise = {
-      ...newExercise,
-      Sets: '',
-      Repeticiones: '',
-      Peso: '',
-      Equipamiento: '',
-      Duración: '',
-      Distancia: '',
-      TipoEstiramiento: '',
-      isEntrenamientoDeFuerza: 0,
-      isCardio_Circuitos: 0,
-      isCore_Estabilidad: 0,
-      isPliométricos: 0,
-      isFlexibilidad_Movilidad: 0,
-      category: value  // Explicitly setting the category
-    };
-
-    resetExercise[value] = 1;  // Activate the selected category
-
-    const categoryAttributes = getCategoryAttributes(value);
-    categoryAttributes.forEach(attr => {
-      resetExercise[attr] = newExercise[attr];
-    });
-
-    setNewExercise(resetExercise);
+  const handleCategoryChange = (e) => {
+    const { value } = e.target; // one of is_cardio|is_strength|...
+    setForm(prev => ({
+      ...prev,
+      is_cardio: false,
+      is_strength: false,
+      is_flexibility: false,
+      is_core: false,
+      is_plyo: false,
+      [value]: true,
+      category: value,
+    }));
   };
 
-
-
-  const addExercise = (event) => {
-    event.preventDefault();
-    axios.post('http://localhost/react_php_app/api.php?table=ejercicio', newExercise)
-      .then(response => {
-        const addedExercise = { ...newExercise, EjercicioID: response.data.id };
-        console.log('Added exercise:', addedExercise);
-        setExercises(prev => [...prev, addedExercise]);
-        resetForm();
-      })
-      .catch(error => {
-        console.error('Error adding exercise:', error);
-      });
+  const resetForm = () => {
+    setForm(emptyForm);
+    setEditing(false);
+    setCurrentExerciseId(null);
   };
 
-  const deleteExercise = (id) => {
+  const addExercise = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        name: form.name,
+        description: form.description,
+        sets: toNumberOrNull(form.sets),
+        reps: toNumberOrNull(form.reps),
+        weight: form.weight === '' ? null : Number(form.weight),
+        equipment: form.equipment || null,
+        duration: hhmmToTime(form.duration),
+        distance: form.distance === '' ? null : Number(form.distance),
+        stretch_type: form.stretch_type || null,
+        is_strength: !!form.is_strength,
+        is_cardio: !!form.is_cardio,
+        is_core: !!form.is_core,
+        is_plyo: !!form.is_plyo,
+        is_flexibility: !!form.is_flexibility,
+      };
+      const { data } = await api.post('/exercises', payload);
+      const added = { ...data, category: pickCategoryValue(data) };
+      setExercises(prev => [...prev, added]);
+      resetForm();
+    } catch (err) {
+      console.error('Error adding exercise:', err);
+    }
+  };
+
+  const deleteExercise = async (id) => {
     const confirmDelete = window.confirm(t('glob.delete?'));
-    if (confirmDelete) {
-      console.log(`Attempting to delete exercise with ID: ${id}`);
-      axios.delete(`http://localhost/react_php_app/api.php?table=ejercicio&id=${id}`)
-        .then(response => {
-          console.log(`Successfully deleted exercise with ID: ${id}`);
-          setExercises(prev => prev.filter(exercise => exercise.EjercicioID !== id));
-        })
-        .catch(error => {
-          console.error(`Error deleting exercise with ID: ${id}`, error);
-        });
+    if (!confirmDelete) return;
+    try {
+      await api.delete(`/exercises/${id}`);
+      setExercises(prev => prev.filter(ex => (ex.id || ex.EjercicioID) !== id));
+    } catch (err) {
+      console.error('Error deleting exercise:', err);
     }
   };
 
   const editExercise = (exercise) => {
     setEditing(true);
-    setCurrentExercise(exercise);
-    setNewExercise({
-      ...exercise,
-      category: Object.keys(exercise).find(key => exercise[key] === 1 && key.startsWith('is')) // Setting the category
+    setCurrentExerciseId(exercise.id || exercise.EjercicioID);
+    setForm({
+      name: exercise.name || exercise.Nombre || '',
+      description: exercise.description || exercise.Descripción || '',
+      sets: exercise.sets || exercise.Sets || '',
+      reps: exercise.reps || exercise.Repeticiones || '',
+      weight: exercise.weight || exercise.Peso || '',
+      equipment: exercise.equipment || exercise.Equipamiento || '',
+      duration: timeToHHMM(exercise.duration || exercise.Duración || ''),
+      distance: exercise.distance || exercise.Distancia || '',
+      stretch_type: exercise.stretch_type || exercise.TipoEstiramiento || '',
+      is_strength: !!(exercise.is_strength || exercise.isEntrenamientoDeFuerza),
+      is_cardio: !!(exercise.is_cardio || exercise.isCardio_Circuitos),
+      is_core: !!(exercise.is_core || exercise.isCore_Estabilidad),
+      is_plyo: !!(exercise.is_plyo || exercise.isPliométricos),
+      is_flexibility: !!(exercise.is_flexibility || exercise.isFlexibilidad_Movilidad),
+      category: pickCategoryValue(exercise),
     });
   };
 
-
-  const updateExercise = (event) => {
-    event.preventDefault();
-    axios.put(`http://localhost/react_php_app/api.php?table=ejercicio&id=${currentExercise.EjercicioID}`, newExercise)
-      .then(response => {
-        const updatedExercises = exercises.map(ex => (ex.EjercicioID === currentExercise.EjercicioID ? { ...newExercise, EjercicioID: currentExercise.EjercicioID } : ex));
-        setExercises(updatedExercises);
-        resetForm();
-        setEditing(false);
-        setCurrentExercise(null);
-      })
-      .catch(error => {
-        console.error('Error updating exercise:', error);
-      });
-  };
-
-  const resetForm = () => {
-    setNewExercise({
-      Nombre: '',
-      Descripción: '',
-      Sets: '',
-      Repeticiones: '',
-      Peso: '',
-      Equipamiento: '',
-      Duración: '',
-      Distancia: '',
-      TipoEstiramiento: '',
-      isEntrenamientoDeFuerza: 0,
-      isCardio_Circuitos: 0,
-      isCore_Estabilidad: 0,
-      isPliométricos: 0,
-      isFlexibilidad_Movilidad: 0
-    });
+  const updateExercise = async (e) => {
+    e.preventDefault();
+    if (!currentExerciseId) return;
+    try {
+      const payload = {
+        name: form.name,
+        description: form.description,
+        sets: toNumberOrNull(form.sets),
+        reps: toNumberOrNull(form.reps),
+        weight: form.weight === '' ? null : Number(form.weight),
+        equipment: form.equipment || null,
+        duration: hhmmToTime(form.duration),
+        distance: form.distance === '' ? null : Number(form.distance),
+        stretch_type: form.stretch_type || null,
+        is_strength: !!form.is_strength,
+        is_cardio: !!form.is_cardio,
+        is_core: !!form.is_core,
+        is_plyo: !!form.is_plyo,
+        is_flexibility: !!form.is_flexibility,
+      };
+      const { data } = await api.patch(`/exercises/${currentExerciseId}`, payload);
+      const updated = { ...data, category: pickCategoryValue(data) };
+      setExercises(prev => prev.map(ex => (ex.id === currentExerciseId || ex.EjercicioID === currentExerciseId ? updated : ex)));
+      resetForm();
+    } catch (err) {
+      console.error('Error updating exercise:', err);
+    }
   };
 
   const getCategoryAttributes = (category) => {
@@ -161,7 +199,7 @@ function Exercises() {
     return selectedCategory ? selectedCategory.attributes : [];
   };
 
-  const selectedCategory = Object.keys(newExercise).find(key => newExercise[key] === 1);
+  const selectedCategory = form.category;
 
   return (
     <div>
@@ -170,75 +208,77 @@ function Exercises() {
       <form onSubmit={editing ? updateExercise : addExercise}>
         <input
           type="text"
-          name="Nombre"
-          value={newExercise.Nombre}
-          onChange={handleExerciseChange}
+          name="name"
+          value={form.name}
+          onChange={handleChange}
           placeholder={t('exercisesP.n_exercises')}
         />
-        <select name="category" value={newExercise.category || ''} onChange={handleCategoryChange}>
+        <select name="category" value={form.category || ''} onChange={handleCategoryChange}>
           <option value="">{t('exercisesP.select_category')}</option>
           {categories.map(cat => (
             <option key={cat.value} value={cat.value}>{cat.label}</option>
           ))}
         </select>
         <textarea
-          name="Descripción"
-          value={newExercise.Descripción}
-          onChange={handleExerciseChange}
+          name="description"
+          value={form.description}
+          onChange={handleChange}
           placeholder="Descripción"
         />
         <input
           type="number"
-          name="Sets"
-          value={newExercise.Sets}
-          onChange={handleExerciseChange}
+          name="sets"
+          value={form.sets}
+          onChange={handleChange}
           placeholder="Sets"
         />
         <input
           type="number"
-          name="Repeticiones"
-          value={newExercise.Repeticiones}
-          onChange={handleExerciseChange}
+          name="reps"
+          value={form.reps}
+          onChange={handleChange}
           placeholder="Repeticiones"
         />
-        {getCategoryAttributes(selectedCategory).includes('Peso') && (
+        {getCategoryAttributes(selectedCategory).includes('weight') && (
           <input
             type="number"
-            name="Peso"
-            value={newExercise.Peso}
-            onChange={handleExerciseChange}
+            step="0.01"
+            name="weight"
+            value={form.weight}
+            onChange={handleChange}
             placeholder="Peso (lbs)"
           />
         )}
-        {getCategoryAttributes(selectedCategory).includes('Equipamiento') && (
+        {getCategoryAttributes(selectedCategory).includes('equipment') && (
           <input
             type="text"
-            name="Equipamiento"
-            value={newExercise.Equipamiento}
-            onChange={handleExerciseChange}
+            name="equipment"
+            value={form.equipment}
+            onChange={handleChange}
             placeholder="Equipamiento"
           />
         )}
-        {getCategoryAttributes(selectedCategory).includes('Duración') && (
+        {getCategoryAttributes(selectedCategory).includes('duration') && (
           <input
             type="time"
-            name="Duración"
-            value={newExercise.Duración}
-            onChange={handleExerciseChange}
+            name="duration"
+            value={form.duration}
+            onChange={handleChange}
             placeholder="Duración"
           />
         )}
-        {getCategoryAttributes(selectedCategory).includes('Distancia') && (
+        {getCategoryAttributes(selectedCategory).includes('distance') && (
           <input
             type="number"
-            name="Distancia"
-            value={newExercise.Distancia}
-            onChange={handleExerciseChange}
+            step="0.01"
+            name="distance"
+            value={form.distance}
+            onChange={handleChange}
             placeholder="Distancia (miles)"
           />
         )}
-        {getCategoryAttributes(selectedCategory).includes('TipoEstiramiento') && (
-          <select name="TipoEstiramiento" value={newExercise.TipoEstiramiento} onChange={handleExerciseChange}>
+        {getCategoryAttributes(selectedCategory).includes('stretch_type') && (
+          <select name="stretch_type" value={form.stretch_type} onChange={handleChange}>
             <option value="">{t('exercisesP.select_stretch_type')}</option>
             <option value="static">Static</option>
             <option value="active">Active</option>
@@ -253,18 +293,18 @@ function Exercises() {
         {exercises.map((exercise) => {
           const categoryLabel = categories.find(cat => cat.value === exercise.category)?.label || 'Unknown';
           return (
-            <li key={exercise.EjercicioID}>
-              <strong>{exercise.Nombre}</strong> - {categoryLabel}
-              <p>{exercise.Descripción}</p>
-              {(exercise.Sets && exercise.Sets !== "0") && <p>{exercise.Sets} sets</p>}
-              {(exercise.Repeticiones && exercise.Repeticiones !== "0") && <p>{exercise.Repeticiones} reps</p>}
-              {exercise.Peso && <p>Peso: {exercise.Peso} lbs</p>}
-              {exercise.Equipamiento && <p>Equipamiento: {exercise.Equipamiento}</p>}
-              {exercise.Duración && <p>Duración: {exercise.Duración}</p>}
-              {exercise.Distancia && <p>Distancia: {exercise.Distancia} miles</p>}
-              {exercise.TipoEstiramiento && <p>TipoEstiramiento: {exercise.TipoEstiramiento}</p>}
-              <button onClick={() => deleteExercise(exercise.EjercicioID)}>Eliminar</button>
-              <button onClick={() => editExercise(exercise)}>Editar</button>
+            <li key={exercise.id || exercise.EjercicioID}>
+              <strong>{exercise.name || exercise.Nombre}</strong> - {categoryLabel}
+              <p>{exercise.description || exercise.Descripción}</p>
+              {(exercise.sets && String(exercise.sets) !== '0') && <p>{exercise.sets} sets</p>}
+              {(exercise.reps && String(exercise.reps) !== '0') && <p>{exercise.reps} reps</p>}
+              {exercise.weight && <p>Peso: {exercise.weight} lbs</p>}
+              {exercise.equipment && <p>Equipamiento: {exercise.equipment}</p>}
+              {(exercise.duration || exercise.Duración) && <p>Duración: {timeToHHMM(exercise.duration || exercise.Duración)}</p>}
+              {exercise.distance && <p>Distancia: {exercise.distance} miles</p>}
+              {(exercise.stretch_type || exercise.TipoEstiramiento) && <p>TipoEstiramiento: {exercise.stretch_type || exercise.TipoEstiramiento}</p>}
+              <button onClick={() => deleteExercise(exercise.id || exercise.EjercicioID)}>{t('glob.delete')}</button>
+              <button onClick={() => editExercise(exercise)}>{t('glob.edit')}</button>
             </li>
           );
         })}

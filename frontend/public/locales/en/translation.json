@@ -17,8 +17,8 @@
         "routines": "Routines",
         "exercises": "Exercises",
         "programs": "Programs",
-    "goals": "Goals",
-    "logout": "Logout"
+        "goals": "Goals",
+        "logout": "Logout"
     },
     "loginP": {
         "login": "Log In",
@@ -31,7 +31,19 @@
         "r_password": "Password Recovery",
         "re_password": "Recover Password",
         "confirm_password": "Confirm Password",
-        "create_account": "Create an account"
+        "create_account": "Create an account",
+        "subtitle": "Welcome back. Please sign in to continue.",
+        "loading": "Signing in…",
+        "error_invalid": "Invalid email or password.",
+        "invalid_email": "Enter a valid email",
+        "required_password": "Password is required",
+        "show": "Show",
+        "hide": "Hide",
+        "register_subtitle": "Create your account to get started.",
+        "password_mismatch": "Passwords do not match",
+        "register_failed": "Registration failed",
+        "name": "Name",
+        "name_placeholder": "Your name"
     },
     "dashboardP": {
         "welcome": "Welcome Back!",
@@ -94,4 +106,3 @@
       "sel_routines": "Select Routines"
     }
   }
-  

@@ -7,3 +7,5 @@ PyJWT==2.9.0
 # SQL Server ODBC driver binding (requires system libs; optional if not migrating locally)
 pyodbc==5.1.0
 django-cors-headers==4.4.0
+# Filtering support
+django-filter==24.2

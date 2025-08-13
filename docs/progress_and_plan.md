@@ -7,7 +7,7 @@
   - Migrations applied; minimal auth test passing.
 - Frontend (React)
   - AuthContext wired (register/login/logout, `/users/me`).
-  - Pages integrated with DRF: Sessions, Goals, Routines, Programs.
+  - Pages integrated with DRF: Sessions, Goals, Routines, Programs, Exercises.
   - i18n and routing work under subpaths (e.g., `/~maryu/fitness_tracker`).
 - Data/ETL
   - SQL Server target schema, Legacy→Modern mapping, and MariaDB→SQL Server ETL toolkit available.
@@ -15,14 +15,13 @@
 ## Requirements Coverage
 - PRD/ERD/DDL/OpenAPI/Mapping/ETL: Done
 - DRF backend, JWT auth, migrations, admin: Done
-- Frontend auth + core pages consuming DRF: Done (Exercises page migration pending)
+- Frontend auth + core pages consuming DRF: Done (Exercises page migrated)
 - Dev setup scripts and docs: Done
 - CI (backend tests): Done; Frontend CI: Deferred
 - Production DB config and deploy guides: Deferred
 
 ## Next Steps by Agent
 - Frontend (dev + ux-expert)
-  - Migrate Exercises page to DRF.
   - Add form validation, toasts, and loading states across pages.
   - Harden 401 handling (redirect to login, token refresh if desired).
 - Backend (dev + architect)
@@ -42,10 +41,9 @@
   - Postman collection or curl cookbook.
 
 ## Short-Term Sprint (2–3 days)
-1) Exercises page → DRF
-2) Backend pagination + docs
-3) Django tests for goals/routines
-4) Frontend CI job
+1) Backend pagination + docs
+2) Django tests for goals/routines
+3) Frontend CI job
 
 ## Risks/Notes
 - Subpath hosting is handled at runtime; set `PUBLIC_URL` if you need a fixed prefix.

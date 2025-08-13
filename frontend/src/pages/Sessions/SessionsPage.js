@@ -45,8 +45,6 @@ function Sessions() {
         }
     };
 
-    const fmtRoutine = (id) => routines.find(r => r.id === id)?.name || '—';
-
     return (
         <div>
             <h1>{t('sessionsP.reg_sessions')}</h1>

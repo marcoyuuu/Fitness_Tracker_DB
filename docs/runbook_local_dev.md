@@ -52,6 +52,14 @@ Notes:
 - CORS is enabled in dev to allow the React app to call the API.
 - The default DB is SQLite; production can switch to SQL Server via env (`DB_ENGINE=mssql`, see `settings.py`).
 
+### Pagination, Filtering, Ordering
+- All list endpoints are paginated (PageNumberPagination): `?page=1` (default page size 20, configurable via `PAGE_SIZE`).
+- Filtering: use exact-match query params for fields declared in each viewset (see Swagger docs). Examples:
+  - `/api/exercises?is_strength=true`
+  - `/api/goals?is_completed=true&ordering=-created_at`
+- Search: `?search=<term>` on supported endpoints (e.g., exercises name/description/equipment).
+- Ordering: `?ordering=name` or multiple with commas; prefix with `-` for descending.
+
 ## Frontend (React)
 
 - Start the app (in another terminal):
@@ -81,7 +89,7 @@ You may see a dev warning about a missing source map in a dependency (`@react-ar
   ```
 
 ## Smoke tests
-- Register or login in the frontend, then visit Sessions/Goals/Routines/Programs pages and perform basic CRUD.
+- Register or login in the frontend, then visit Sessions/Goals/Routines/Programs/Exercises pages and perform basic CRUD.
 - Alternatively use Swagger UI to exercise the API directly.
 
 ## Troubleshooting

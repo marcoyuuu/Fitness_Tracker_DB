@@ -12,6 +12,9 @@ from . import models, serializers
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = models.Session.objects.select_related("user").all().order_by("-date")
     serializer_class = serializers.SessionSerializer
+    filterset_fields = ["date", "duration_min", "user__id"]
+    search_fields = ["user__email"]
+    ordering_fields = ["date", "duration_min", "created_at"]
 
     def get_serializer_class(self):
         if self.action in ["create"]:
@@ -57,6 +60,9 @@ class CommentViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
 class GoalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = models.Goal.objects.select_related("user").all().order_by("-created_at")
     serializer_class = serializers.GoalSerializer
+    filterset_fields = ["is_completed", "due_date"]
+    search_fields = ["description"]
+    ordering_fields = ["created_at", "due_date", "updated_at"]
 
     def create(self, request, *args, **kwargs):
         ser = serializers.GoalCreateSerializer(data=request.data)
@@ -69,6 +75,9 @@ class GoalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateM
 class RoutineViewSet(viewsets.ModelViewSet):
     queryset = models.Routine.objects.all().order_by("name")
     serializer_class = serializers.RoutineSerializer
+    filterset_fields = ["name"]
+    search_fields = ["name", "description"]
+    ordering_fields = ["name"]
 
     @action(detail=True, methods=["get", "post"], url_path="exercises")
     def exercises(self, request, pk=None):
@@ -86,11 +95,23 @@ class RoutineViewSet(viewsets.ModelViewSet):
 class ExerciseViewSet(viewsets.ModelViewSet):
     queryset = models.Exercise.objects.all().order_by("name")
     serializer_class = serializers.ExerciseSerializer
+    filterset_fields = [
+        "is_strength",
+        "is_cardio",
+        "is_core",
+        "is_plyo",
+        "is_flexibility",
+    ]
+    search_fields = ["name", "description", "equipment"]
+    ordering_fields = ["name", "sets", "reps", "weight", "distance"]
 
 
 class ProgramViewSet(viewsets.ModelViewSet):
     queryset = models.Program.objects.all().order_by("-start_date")
     serializer_class = serializers.ProgramSerializer
+    filterset_fields = ["start_date", "end_date"]
+    search_fields = ["name", "description"]
+    ordering_fields = ["start_date", "end_date", "name"]
 
     @action(detail=True, methods=["get", "post"], url_path="routines")
     def routines(self, request, pk=None):

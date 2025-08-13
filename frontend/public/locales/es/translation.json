@@ -18,8 +18,8 @@
         "routines": "Rutinas",
         "exercises": "Ejercicios",
         "programs": "Programas",
-    "goals": "Metas",
-    "logout": "Salir"
+        "goals": "Metas",
+        "logout": "Salir"
     },
     "loginP": {
         "login": "Iniciar Sesión",
@@ -32,7 +32,10 @@
         "r_password": "Recuperación de contraseña",
         "re_password": "Recuperar contraseña",
         "confirm_password": "Confirmar Contraseña",
-        "create_account": "Crear una cuenta"
+        "create_account": "Crear una cuenta",
+        "subtitle": "Bienvenido de nuevo. Por favor inicia sesión para continuar.",
+        "loading": "Iniciando sesión…",
+        "error_invalid": "Correo o contraseña inválidos."
     },
     "dashboardP": {
         "welcome": "¡Bienvenido de nuevo!",
@@ -95,4 +98,3 @@
       "sel_routines": "Seleccionar Rutinas"
     }
   }
-  
